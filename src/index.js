@@ -1,5 +1,58 @@
 import './css/styles.css';
+import Notiflix, { Notify } from 'notiflix';
+import { fetchCountries } from './js/fetch';
+import debounce from 'lodash.debounce';
 
 const DEBOUNCE_DELAY = 300;
 
-// console.log()
+const refs = {
+    inputSearchCountry: document.querySelector('input#search-box'),
+    countryList: document.querySelector('.country-list')
+}
+
+const { inputSearchCountry, countryList } = refs;
+
+inputSearchCountry.addEventListener('input', debounce(onInputCountryValue, DEBOUNCE_DELAY));
+
+function onInputCountryValue(e) {
+    const userValue = e.target.value;
+    userValue.trim()
+    if (!userValue) {
+        countryList.innerHTML = '';
+        return
+    }
+    fetchCountries(userValue).then(data => {
+        if (data.length > 10) {
+            return Notify.info('Too many matches found. Please enter a more specific name.');
+        } else if (data.length >= 2) {
+            markupForManyCountries(data);
+        } else if (data.length === 1) {
+            markupForOneElement(data)
+        }
+    }).catch(err => Notify.failure('Oops, there is no country with that name'));
+}
+
+function markupForManyCountries(array) {
+    countryList.innerHTML = '';
+      const newMarkup = array.map(({name, flags}) => {
+        return `<li class='country-list'><div class='flex-box'><img src="${flags.svg}" alt="${name.official}" width='50' height='50'>
+    <p>${name.official}</p></div></li>`
+      }).join('');
+    
+    countryList.insertAdjacentHTML('beforeend', newMarkup);
+}
+
+function markupForOneElement(array) {
+    countryList.innerHTML = '';
+    const mainMarkup = array.map(({ name, flags, capital, population, languages }) => {
+            return `<div class="flex-box">
+      <img src="${flags.svg}" alt="${name.official}" width='50' height='50'>
+      <p>${name.official}</p>
+    </div>
+    <p><span class='params'>Capital:</span> ${capital}</p>
+    <p><span class='params'>Population:</span> ${population}</p>
+    <p><span class='params'>Languages:</span> ${Object.values(languages)}</p>`
+        }).join('');
+
+    countryList.insertAdjacentHTML('beforeend', mainMarkup);
+}
