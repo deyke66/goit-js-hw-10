@@ -18,22 +18,26 @@ function onInputCountryValue(e) {
     const userValue = e.target.value;
     userValue.trim()
     if (!userValue) {
-        countryList.innerHTML = '';
+        clearHtml()
         return
     }
     fetchCountries(userValue).then(data => {
         if (data.length > 10) {
+            clearHtml()
             return Notify.info('Too many matches found. Please enter a more specific name.');
         } else if (data.length >= 2) {
             markupForManyCountries(data);
         } else if (data.length === 1) {
             markupForOneElement(data)
         }
-    }).catch(err => Notify.failure('Oops, there is no country with that name'));
+    }).catch(err => {
+        clearHtml();
+        return Notify.failure('Oops, there is no country with that name')
+    });
 }
 
 function markupForManyCountries(array) {
-    countryList.innerHTML = '';
+    clearHtml();
       const newMarkup = array.map(({name, flags}) => {
         return `<li class='country-list'><div class='flex-box'><img src="${flags.svg}" alt="${name.official}" width='50' height='50'>
     <p>${name.official}</p></div></li>`
@@ -43,7 +47,7 @@ function markupForManyCountries(array) {
 }
 
 function markupForOneElement(array) {
-    countryList.innerHTML = '';
+    clearHtml();
     const mainMarkup = array.map(({ name, flags, capital, population, languages }) => {
             return `<div class="flex-box">
       <img src="${flags.svg}" alt="${name.official}" width='50' height='50'>
@@ -55,4 +59,7 @@ function markupForOneElement(array) {
         }).join('');
 
     countryList.insertAdjacentHTML('beforeend', mainMarkup);
+}
+function clearHtml() {
+   countryList.innerHTML = ''; 
 }
