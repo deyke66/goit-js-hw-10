@@ -16,12 +16,11 @@ inputSearchCountry.addEventListener('input', debounce(onInputCountryValue, DEBOU
 
 function onInputCountryValue(e) {
     const userValue = e.target.value;
-    userValue.trim()
     if (!userValue) {
         clearHtml()
         return
     }
-    fetchCountries(userValue).then(data => {
+    fetchCountries(userValue.trim()).then(data => {
         if (data.length > 10) {
             clearHtml()
             return Notify.info('Too many matches found. Please enter a more specific name.');

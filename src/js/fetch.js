@@ -1,5 +1,8 @@
 export function fetchCountries(name) {
-    return fetch(`https://restcountries.com/v3.1/name/${name}?fields=name,languages,population,capital,flags`).then(resp => {
+    const BASIC_URL = 'https://restcountries.com/v3.1';
+    const ENPOINT = '/name/';
+    const PARAM_FOR_FILTER = 'fields=name,languages,population,capital,flags';
+    return fetch(`${BASIC_URL}${ENPOINT}${name}?${PARAM_FOR_FILTER}`).then(resp => {
         if (!resp.ok) {
             throw new Error(resp.status)
         }
